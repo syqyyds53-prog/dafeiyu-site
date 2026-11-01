@@ -1,14 +1,67 @@
+/* ============================================================
+   style.css —— 页面长相全在这儿
+   分段：1 基础  2 背景层  3 内容卡片  4 小鱼
+   ============================================================ */
+
+/* ---------- 1 基础 ---------- */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-  background: #cfe3ff;
-  color: #1f2937;
+  background-color: #0a1628;
+  color: #e2e8f0;
   line-height: 1.9;
   padding: 0 20px;
   min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
 }
 
+/* ---------- 2 背景层 ----------
+   深蓝底 + 网格 + 两团光晕 + 扫描线。
+   全是 CSS 画的，没一张图片。 */
+
+/* 网格：横竖各一条 1px 线，32px 一格，透明度 5%，几乎看不见但撑住了质感 */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(6, 231, 233, 0.05) 1px, transparent 0),
+    linear-gradient(90deg, rgba(6, 231, 233, 0.05) 1px, transparent 0);
+  background-size: 32px 32px;
+}
+
+/* 光晕：左上偏蓝、右下偏青，像舞台上打了两盏灯 */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(26, 58, 92, 0.65) 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 80%, rgba(6, 231, 233, 0.08) 0%, transparent 50%);
+}
+
+/* 扫描线：老电视那种细横纹，3px 一道，3% 黑，盖在最上层但不挡点击 */
+body .scanlines {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.03),
+    rgba(0, 0, 0, 0.03) 1px,
+    transparent 0,
+    transparent 3px
+  );
+}
+
+/* ---------- 3 内容卡片 ---------- */
 header {
   max-width: 640px;
   margin: 0 auto;
@@ -19,14 +72,14 @@ h1 {
   font-size: 40px;
   letter-spacing: 2px;
   margin-bottom: 8px;
-  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  background: linear-gradient(90deg, #06e7e9, #3b82f6);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
 .sub {
-  color: #6b7280;
+  color: #94a3b8;
   font-size: 14px;
 }
 
@@ -35,27 +88,53 @@ main { max-width: 640px; margin: 0 auto; }
 section {
   margin-bottom: 40px;
   padding: 24px;
-  background: #fff;
-  border-radius: 12px;
-  border-left: 4px solid #bfdbfe;
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.08);
+  background: rgba(15, 35, 58, 0.75);
+  border-radius: 4px;
+  border: 1px solid rgba(6, 231, 233, 0.22);
+  box-shadow:
+    0 0 0 1px rgba(6, 231, 233, 0.06),
+    0 8px 30px rgba(0, 0, 0, 0.35);
 }
 
-h2 { font-size: 18px; margin-bottom: 10px; color: #2563eb; }
+h2 { font-size: 18px; margin-bottom: 10px; color: #06e7e9; }
 
 footer {
   max-width: 640px;
   margin: 60px auto 40px;
-  color: #9ca3af;
+  color: #64748b;
   font-size: 13px;
 }
 
-/* 小马 —— 不，小鱼 */
+/* ---------- 4 小鱼 ---------- */
 #fish {
   position: fixed;
   left: 0;
   top: 0;
+  z-index: 80;
   font-size: 32px;
   pointer-events: none;
   will-change: transform;
+  filter: drop-shadow(0 0 8px rgba(79, 195, 247, 0.55));
+}
+
+/* 雨滴容器：铺满全屏，但只是个看不见的框，雨滴由 JS 塞进来 */
+#rain {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* 一滴雨从头到尾：从屏幕上方 -10px 落到 110vh 之外，带一点点斜 */
+@keyframes pixelRain {
+  0%   { transform: translateY(-10px) skewX(-6deg); opacity: 0; }
+  8%   { opacity: 1; }
+  92%  { opacity: 1; }
+  100% { transform: translateY(110vh) skewX(-6deg); opacity: 0; }
+}
+
+/* 系统开了「减少动态效果」时，雨停掉 */
+@media (prefers-reduced-motion: reduce) {
+  #rain > div { display: none; }
 }
